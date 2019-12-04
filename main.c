@@ -54,7 +54,20 @@ void build_cache(cache *cache, int capacity, int way, int blocksize, int set) {
 	}
 }
 
-void access_cache() {
+void access_cache(cache *cache, const int op, const uint32_t addr, int *hit, int *miss, int *wb) {
+	time++;
+	int b = cache->b;
+	int s = cache->s;
+	int way = cache->E;
+	int longest[2] = {time, 2};
+	
+	uint32_t tag = addr >> (s + b);
+	uint32_t idx = addr << (32 - s - b);
+	idx = idx >> (32 - s);
+
+	uint32_t block = addr << (32 - b);
+	block = block >> (32 - b);
+
 
 }
 
