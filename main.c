@@ -303,6 +303,7 @@ int main(int argc, char *argv[]) {
 
     /* TODO: Define a cache based on the struct declaration */
     // simCache = build_cache();
+	build_cache(&simCache, capacity, way, blocksize, set);
 
 	// simulate
 	fp = fopen(trace_name, "r"); // read trace file
@@ -322,6 +323,13 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "op: %s\n", op);
         fprintf(stderr, "addr: %x\n", addr);
 #endif
+	if (strcmp(op, "R") == 0) {
+		read++;
+		access_cache(&simCache, 0, addr, &readhit, &readmiss, &writeback);
+	} else {
+		write++;
+		access_cache(&simCache, 1, addr, &writehit, &writemiss, &writeback);
+	}
         // ...
         // access_cache()
         // ...
