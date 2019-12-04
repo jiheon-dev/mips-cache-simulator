@@ -39,8 +39,19 @@ static int index_bit(int n) {
 	return cnt-1;
 }
 
-void build_cache() {
+void build_cache(cache *cache, int capacity, int way, int blocksize, int set) {
+	cache->E = way;
+	cache->b = index_bit(blocksize);
+	cache->s = index_bit(set);
+	cache->sets = malloc(sizeof(cset) *set);
 
+	for (int i = 0; i < set; i++) {
+		cache->sets[i].lines = malloc(sizeof(cline) *way);
+		for (int j = 0; j < way; j++) {
+			cache->sets[i].lines[j].valid = 0;
+			cache->sets[i].lines[j].modified = 0;
+		}
+	}
 }
 
 void access_cache() {
