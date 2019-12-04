@@ -68,7 +68,66 @@ void access_cache(cache *cache, const int op, const uint32_t addr, int *hit, int
 	uint32_t block = addr << (32 - b);
 	block = block >> (32 - b);
 
+	switch (op) {
+		case 0:
+			for (int i = 0; i < way; i++) {
+				if(cache->sets[idx].lines[i].valid && cache->sets[idx].lines[i].tag == tag) {
+					cache->sets[idx].lines[i].age = time; 
 
+					(*hit) += 1;
+					return;
+				}
+			}
+			break;
+
+		case 1:
+			for (int i = 0; i < way; i++) {
+				if (cache->sets[idx].lines[i].valid && cache->sets[idx].lines[i].tag == tag){
+					cache->sets[idx].lines[i].modified = 1;
+					cache->sets[idx].lines[i].age = time;
+
+					(*hit) += 1;
+					return;
+				}
+			}
+			break;
+	}
+
+	for (int i = 0; i < way; i++) {
+		if (cache->sets[idx].lines[i].valid == 0) {
+			cache->sets[idx].lines[i].tag = tag;
+			cache->sets[idx].lines[i].valid = 1;
+			cache->sets[idx].lines[i].age = time;
+				
+			if (op == 0) 
+				cache->sets[idx].lines[i].modified = 0;
+			else 
+				cache->sets[idx].lines[i].modified=1;
+			
+			(*miss) += 1;
+			return;
+		}
+	}
+
+	for (int i = 0; i < way; i++) {
+		if (cache->sets[idx].lines[i].age < longest[0]) {
+			longest[0] = cache->sets[idx].lines[i].age;
+			longest[1] = i;
+		}
+	}
+
+	if (cache->sets[idx].lines[longest[1]].modified) 
+		(*wb) += 1;
+
+	cache->sets[idx].lines[longest[1]].tag = tag;
+	cache->sets[idx].lines[longest[1]].age = time;
+
+	if(op == 0) 
+		cache->sets[idx].lines[longest[1]].modified = 0;
+	else 
+		cache->sets[idx].lines[longest[1]].modified = 1;
+		
+	(*miss)+=1;
 }
 
 /***************************************************************/
